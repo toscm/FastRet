@@ -9,13 +9,13 @@ fastret.workflow(
   method = "glmnet",
   verbose = FALSE,
   data_set_name = "data set",
-  final_model = T,
-  preprocessed = F,
-  interaction_terms = F,
+  final_model = TRUE,
+  preprocessed = FALSE,
+  interaction_terms = FALSE,
   nfolds = 2,
-  include_polynomial = F,
+  include_polynomial = FALSE,
   degree_polynomial = 2,
-  scale = T
+  scale = TRUE
 )
 }
 \arguments{

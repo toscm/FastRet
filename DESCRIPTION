@@ -11,7 +11,7 @@ License: GPL-3
 biocViews: Retention, Time, Chromotography, LC-MS
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Suggests:
     knitr,
     rmarkdown
@@ -19,7 +19,6 @@ VignetteBuilder: knitr
 Depends: R (>= 4.2.0)
 Imports:
     caret,
-    desc,
     ggplot2,
     glmnet,
     pdist,
@@ -28,5 +27,4 @@ Imports:
     shiny,
     shinybusy,
     shinyhelper,
-    xgboost,
     xlsx

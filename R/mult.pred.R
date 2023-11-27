@@ -29,7 +29,7 @@ mult.pred<- function(model,pred_data, lm_transfer, lm_model, lm_predictors){
   if(model$method== "glmnet"){
     x<- data.matrix(x)
   }
-  pred<- statspredict(model$final_model,newx=x)
+  pred<- stats::predict(model$final_model,newx=x)
   pred_data$pred_RT<- pred
 
   if (lm_transfer){

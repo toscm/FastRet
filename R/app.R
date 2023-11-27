@@ -20,12 +20,9 @@
 #'
 #' This step requires a pretrained model which can be uploaded. You can then use your model to predict retention times of new metabolites by providing either a single SMILE/HMDB ID combination or a list of molecules.
 #'
-#' @param None. This function does not take any parameters.
+#' @param port Port on which to serve the FastRet web app
 #' @return A shiny app. This function returns a shiny app that can be run to interact with the model.
 #' @keywords FastRet
-#' @import shiny
-#' @import shinyhelper
-#' @import shinybusy
 #' @export
 FastRet <- function(port = 80) {
   ui <- app_ui
@@ -179,13 +176,13 @@ app_server <- function(input, output) {
       x$RT <- NULL
       x <- as.matrix(x)
       x <- rbind(x, x)
-      x <- predict(model$scaling_model, x)
+      x <- stats::predict(model$scaling_model, x)
 
       if (model$method == "glmnet") {
         pred <- glmnet::predict.glmnet(model$final_model, newx = x)
         pred <- pred[1]
       } else {
-        pred <- predict(model$final_model, newx = x)
+        pred <- stats::predict(model$final_model, newx = x)
         pred <- pred[1]
       }
 

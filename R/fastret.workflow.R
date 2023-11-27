@@ -15,11 +15,7 @@
 #' @param nfolds number of folds for cross validation
 #' @param scale if TRUE, all variables will be centered to a mean of 0 and scaled to a standard deviation of 1
 #' @keywords FastRet
-#' @import shiny
-#' @import shinyhelper
-#' @import shinybusy
 #' @export
-
 fastret.workflow <- function(data, method = "glmnet",
                            verbose = FALSE,
                            data_set_name = "data set",

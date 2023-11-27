@@ -4,29 +4,36 @@
 \alias{FastRet}
 \title{FastRet Retention time prediction}
 \usage{
-FastRet()
+FastRet(port = 80)
+}
+\arguments{
+\item{port}{Port on which to serve the FastRet web app}
+}
+\value{
+A shiny app. This function returns a shiny app that can be run to interact with the model.
 }
 \description{
-This shiny function will show you a GUI where you can choose between three modes.
+This shiny function will show you a GUI where you can choose between three modes:
 \itemize{
 \item Train new Model
 \item Selective Measuring
 \item Utilize Model on new data
-Each mode is shortly described here. For more information about the inputs see the (?) behind the corresponding input.
 }
+
+Each mode is briefly described below. For more information about the inputs, see the (?) behind the corresponding input.
 \subsection{Train new Model}{
 
-This is usually the first step you take, this mode allows you to create and evaluate a Model on your own new data. Model can be trained with various parameters and afterwards the regression model as well as the predictor set can be downloaded. As an evaluation this step outputs you a scatterplot of your regression model as well as a boxplot with its general performance.
+This mode allows you to create and evaluate a model on your own new data. The model can be trained with various parameters and the regression model and predictor set can be downloaded afterwards. This step outputs a scatterplot of your regression model and a boxplot showing its general performance.
 }
 
 \subsection{Selective Measuring}{
 
-This mode calculates on a given dataset the best k molecules to be measured for a retention time prediction. It uses a combination of Ridge Regression and k-means to determine the best representatives of your dataset. Representatives as well as their corresponding clusters can be downloaded afterwards as an excel file. This step should be used once you have a predictive model ond/or data set and want to use it for new column/gradient/temperature... combination.
+This mode calculates the best k molecules to be measured for a retention time prediction on a given dataset. It uses a combination of Ridge Regression and k-means to determine the best representatives of your dataset. The representatives and their corresponding clusters can be downloaded afterwards as an excel file. This step should be used once you have a predictive model and/or dataset and want to use it for a new column/gradient/temperature... combination.
 }
 
 \subsection{Utilize model on new data}{
 
-This step requires a pretrained model which can be uploaded. Afterwards you can use your model to predict retention times of new metabolites by providing either a single SMILE/HMDB ID combination or a whole list of molecules.
+This step requires a pretrained model which can be uploaded. You can then use your model to predict retention times of new metabolites by providing either a single SMILE/HMDB ID combination or a list of molecules.
 }
 }
 \keyword{FastRet}

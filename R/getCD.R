@@ -5,9 +5,7 @@
 #' @param x dataframe with two mandatory column: "Name" and "SMILES"
 #' @param verbose TRUE if additional print output should be shown
 #' @keywords FastRet
-#' @import rcdk
 #' @export
-
 getCD <- function (x, verbose = FALSE)
 {
   print(paste0("Converting SMILES..."))
