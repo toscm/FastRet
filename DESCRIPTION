@@ -1,0 +1,29 @@
+Package: FastRet
+Title: Retention time prediction and subset selection with a GUI
+Version: 0.99.1
+Authors@R: 
+    person("Christian", "Amesoeder", , "christian.amesoeder@stud.uni-regensburg.de", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: FastRet helps provides a workflow for retention time prediciton. This is mainly but not exclusively done with a GUI.
+License: GPL-3 
+biocViews: Retention, Time, Chromotography, LC-MS
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: R (>= 4.2.0)
+Imports:
+    rcdk,
+    shiny,
+    shinybusy,
+    shinyhelper,
+    readxl,
+    glmnet,
+    caret,
+    xgboost,
+    xlsx,
+    ggplot2,
+    pdist
