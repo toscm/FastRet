@@ -1,6 +1,7 @@
-.Rproj.user
-inst/doc
 .Rhistory
 .Rproj
-FastRet.Rproj
+.Rproj.user
+.vscode/
 docs
+FastRet.Rproj
+inst/doc
