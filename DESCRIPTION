@@ -1,6 +1,6 @@
 Package: FastRet
 Title: Retention time prediction and subset selection with a GUI
-Version: 0.99.2
+Version: 0.99.3
 Authors@R: c(
     person(given = "Christian", family = "Amesoeder", role = c("aut", "cre"), email = "christian.amesoeder@stud.uni-regensburg.de"),
     person(given = "Marian", family = "Schön", role = c("ctb"), email = "marian.schoen@klinik.uni-regensburg.de"),
@@ -16,7 +16,7 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-Depends: R (>= 4.2.0)
+Depends: R (>= 4.1.0)
 Imports:
     caret,
     ggplot2,
