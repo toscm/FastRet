@@ -1,6 +1,8 @@
-^FastRet\.Rproj$
-^\.Rproj\.user$
-^\.github$
 ^_pkgdown\.yml$
+^.lintr$
+^\.github$
+^\.Rproj\.user$
+^Dockerfile$
 ^docs$
+^FastRet\.Rproj$
 ^pkgdown$

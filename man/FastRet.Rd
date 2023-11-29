@@ -4,10 +4,11 @@
 \alias{FastRet}
 \title{FastRet Retention time prediction}
 \usage{
-FastRet(port = 80)
+FastRet(port = 80, host = "0.0.0.0")
 }
 \arguments{
-\item{port}{Port on which to serve the FastRet web app}
+\item{port}{The port the application should listen on}
+\item{host}{The address the application should listen on}
 }
 \value{
 A shiny app. This function returns a shiny app that can be run to interact with the model.
