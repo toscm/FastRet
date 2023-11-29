@@ -10,7 +10,7 @@ getCD <- function (x, verbose = FALSE)
 {
   print(paste0("Converting SMILES..."))
   for (i in seq_len(nrow(x))) {
-    smi <- rcdk::parse.smiles(as.character(unlist(x[i, "SMILES"])))[[1]]
+    smi <- rcdk::parse.smiles(smiles = as.character(unlist(x[i, "SMILES"])))[[1]]
     smi1 <- rcdk::generate.2d.coordinates(smi)
     smi1 <- rcdk::get.smiles(smi, rcdk::smiles.flavors(c("CxSmiles")))
     x$SMILES[i] <- smi1

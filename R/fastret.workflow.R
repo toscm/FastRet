@@ -17,36 +17,39 @@
 #' @keywords FastRet
 #' @export
 fastret.workflow <- function(data, method = "glmnet",
-                           verbose = FALSE,
-                           data_set_name = "data set",
-                           final_model = TRUE,
-                           preprocessed = FALSE,
-                           interaction_terms = FALSE,
-                           nfolds = 2,
-                           include_polynomial = FALSE,
-                           degree_polynomial = 2,
-                           scale = TRUE) {
+                             verbose = FALSE,
+                             data_set_name = "data set",
+                             final_model = TRUE,
+                             preprocessed = FALSE,
+                             interaction_terms = FALSE,
+                             nfolds = 2,
+                             include_polynomial = FALSE,
+                             degree_polynomial = 2,
+                             scale = TRUE) {
   reverse_split <- FALSE
-  split_method<- "CV"
+  split_method <- "CV"
   # calculate Chemical descriptors, clear data
   # and add additional columns (polynomials and
   # interactions)
-  db_rt <- preprocess.data(data, preprocessed = preprocessed,
-                           include_polynomial = include_polynomial,
-                           interaction_terms = interaction_terms,
-                           degree_polynomial = degree_polynomial)
+  db_rt <- preprocess.data(data,
+    preprocessed = preprocessed,
+    include_polynomial = include_polynomial,
+    interaction_terms = interaction_terms,
+    degree_polynomial = degree_polynomial
+  )
 
 
   # Build a model to center and scale the data
   if (scale) {
-
-    preProc <- caret::preProcess(db_rt[, -1], method = c("center",
-                                                         "scale"), rangeBounds = c(0, 1))
+    preProc <- caret::preProcess(db_rt[, -1], method = c(
+      "center",
+      "scale"
+    ), rangeBounds = c(0, 1))
     db_rt <- stats::predict(preProc, db_rt)
   } else {
     preProc <- 0
   }
-  db_rt$NAME<-NULL
+  db_rt$NAME <- NULL
 
   # outer cross validation split (either CV
   # with n-folds or Medoids-kmean with n medoids)
@@ -58,7 +61,6 @@ fastret.workflow <- function(data, method = "glmnet",
   i <- 1
 
   for (inSplit in split) {
-
     if (reverse_split) {
       training <- db_rt[inSplit, ]
       testing <- db_rt[-inSplit, ]
@@ -69,19 +71,24 @@ fastret.workflow <- function(data, method = "glmnet",
 
     # Train Model
     model <- switch(method,
-                    xgboost = fit.xgboost(training),
-                    glmnet = fit.glmnet(training),
-                    stop(paste("method \"",method, "\" is invalid ")))
+      xgboost = fit.xgboost(training),
+      glmnet = fit.glmnet(training),
+      stop(paste("method \"", method, "\" is invalid "))
+    )
     models[[i]] <- model
 
     # analyse performance of model
     title <- paste0(data_set_name, ", ", method)
     if (length(db_rt$RT) == nfolds) {
-      stat <- stats::predict(object = model, newx = as.matrix(testing[,
-                                                               -1]))
+      stat <- stats::predict(object = model, newx = as.matrix(testing[
+        ,
+        -1
+      ]))
     } else {
-      stat <- get.stats(testing, model, name = paste0(title,
-                                                      " iteration ", i))
+      stat <- get.stats(testing, model, name = paste0(
+        title,
+        " iteration ", i
+      ))
     }
 
     stats[[i]] <- stat
@@ -95,17 +102,18 @@ fastret.workflow <- function(data, method = "glmnet",
 
 
   if (final_model) {
-    #train model on whole data set
+    # train model on whole data set
     model <- switch(method,
-                    xgboost = fit.xgboost(db_rt),
-                    glmnet = fit.glmnet(db_rt),
-                    stop(paste("method \"",method, "\" is invalid ")))
-    pred <- data.frame(stats::predict(model,as.matrix(db_rt[,-1])))
-    p <- graphics::plot(x=db_rt$RT,y=t(pred),xlab= "RT",ylab="predicted RT")
-    p <- graphics::abline(a=0,b=1,col="red")
-    return_object$plot <- p
+      xgboost = fit.xgboost(db_rt),
+      glmnet = fit.glmnet(db_rt),
+      stop(paste("method \"", method, "\" is invalid "))
+    )
+    pred <- data.frame(stats::predict(model, as.matrix(db_rt[, -1])))
+    return_object$plot <- function() {
+      p <- graphics::plot(x = db_rt$RT, y = t(pred), xlab = "RT", ylab = "predicted RT")
+      p <- graphics::abline(a = 0, b = 1, col = "red")
+    }
   }
-
 
   # create return object and return all
   # potential interesting variables
@@ -118,10 +126,6 @@ fastret.workflow <- function(data, method = "glmnet",
   return_object$split <- split
   return_object$scaling_model <- preProc
 
-
   print("Workflow completed")
   return(return_object)
 }
-
-
-

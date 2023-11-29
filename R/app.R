@@ -1,72 +1,87 @@
 #' @title FastRet Retention time prediction
-#'
-#' @description This shiny function will show you a GUI where you can choose between three modes:
+#' @description This shiny function will show you a GUI where you can choose
+#' between three modes:
 #'
 #' - Train new Model
 #' - Selective Measuring
 #' - Utilize Model on new data
 #'
-#' Each mode is briefly described below. For more information about the inputs, see the (?) behind the corresponding input.
+#' Each mode is briefly described below. For more information about the inputs,
+#' see the (?) behind the corresponding input.
 #'
 #' ## Train new Model
 #'
-#' This mode allows you to create and evaluate a model on your own new data. The model can be trained with various parameters and the regression model and predictor set can be downloaded afterwards. This step outputs a scatterplot of your regression model and a boxplot showing its general performance.
+#' This mode allows you to create and evaluate a model on your own new data. The
+#' model can be trained with various parameters and the regression model and
+#' predictor set can be downloaded afterwards. This step outputs a scatterplot
+#' of your regression model and a boxplot showing its general performance.
 #'
 #' ## Selective Measuring
 #'
-#' This mode calculates the best k molecules to be measured for a retention time prediction on a given dataset. It uses a combination of Ridge Regression and k-means to determine the best representatives of your dataset. The representatives and their corresponding clusters can be downloaded afterwards as an excel file. This step should be used once you have a predictive model and/or dataset and want to use it for a new column/gradient/temperature... combination.
+#' This mode calculates the best k molecules to be measured for a retention time
+#' prediction on a given dataset. It uses a combination of Ridge Regression and
+#' k-means to determine the best representatives of your dataset. The
+#' representatives and their corresponding clusters can be downloaded afterwards
+#' as an excel file. This step should be used once you have a predictive model
+#' and/or dataset and want to use it for a new column/gradient/temperature...
+#' combination.
 #'
 #' ## Utilize model on new data
 #'
-#' This step requires a pretrained model which can be uploaded. You can then use your model to predict retention times of new metabolites by providing either a single SMILE/HMDB ID combination or a list of molecules.
+#' This step requires a pretrained model which can be uploaded. You can then use
+#' your model to predict retention times of new metabolites by providing either
+#' a single SMILE/HMDB ID combination or a list of molecules.
 #'
-#' @param port Port on which to serve the FastRet web app
+#' @param port The port the application should listen on
+#' @param host The address the application should listen on
 #' @return A shiny app. This function returns a shiny app that can be run to interact with the model.
 #' @keywords FastRet
 #' @export
-FastRet <- function(port = 80) {
-  ui <- app_ui
-  server <- app_server
-  app <- shinyApp(ui = ui, server = server, options = list(port = port))
+FastRet <- function(port = 80, host = "0.0.0.0") {
+  app <- shinyApp(
+    ui = app_ui,
+    server = app_server,
+    options = list(port = port, host = host)
+  )
   return(app)
 }
 
+
 app_server <- function(input, output) {
   text_log <- shiny::reactiveVal("")
+
   shinyhelper::observe_helpers()
-  v_train <- shiny::reactive({
-    shiny::validate(need(input$inputdata != "", "Please select a excel sheet with the required data"))
-  })
 
-  # Calculate and evaluate new Model ----
-  calc_model <- shiny::reactive({
-    shiny.train(
-      raw_data = as.data.frame(
-        readxl::read_excel(input$inputdata$datapath, sheet = 1)
-      ),
-      method = input$method
-    )
-  })
+  calc_model <- shiny::reactiveVal()
   shiny::observeEvent(input$train, {
-    output$scatterplot <- shiny::renderPrint({
-      print("Scatterplot with identity")
-    })
-    output$plot <- shiny::renderPlot({
-      # Check Input Data -------
-      v_train()
-      calc_model()$plot
-    })
-    output$boxplot <- shiny::renderPrint({
-      print("Boxplot with general Performance")
-    })
-    output$plot2 <- shiny::renderPlot({
-      plot.boxplot(calc_model())
-    })
+    if (isTruthy(input$inputdata$datapath)) {
+      x <- shiny.train(
+        raw_data = as.data.frame(readxl::read_excel(input$inputdata$datapath, sheet = 1)),
+        method = input$method
+      )
+      calc_model(x)
+    } else {
+      showNotification("Please upload a excel sheet with the required data first", type = "error")
+    }
+  })
+  output$scatterplot <- shiny::renderPrint({
+    shiny::req(calc_model())
+    print("Scatterplot with identity")
+  })
+  output$plot <- shiny::renderPlot({
+    shiny::req(calc_model())
+    calc_model()$plot()
+  })
+  output$boxplot <- shiny::renderPrint({
+    shiny::req(calc_model())
+    print("Boxplot with general Performance")
+  })
+  output$plot2 <- shiny::renderPlot({
+    shiny::req(calc_model())
+    plot.boxplot(calc_model())
   })
 
-
-
-  # Selective Measuring 2.0 ----
+  # Selective Measuring 2.0
   cluster_calc <- shiny::reactive({
     shiny.sm(
       raw_data = as.data.frame(readxl::read_excel(input$inputdata$datapath, sheet = 1)),
@@ -74,15 +89,12 @@ app_server <- function(input, output) {
     )
   })
 
-
-
-
   shiny::observeEvent(input$sm2, {
     output$medoidtable <- shiny::renderPrint({
       print("Medoids:")
     })
     output$medoids <- shiny::renderTable({
-      v_train()
+      # v_train()
       cluster <- cluster_calc()
       cluster$medoids[, c("NAME", "SMILES")]
     })
@@ -121,7 +133,7 @@ app_server <- function(input, output) {
   )
 
 
-  # Create lm to adjust RT ----
+  # Create lm to adjust RT
   lm_adjust <- shiny::reactive({
     train.lm(
       original_data = base::readRDS(input$pretrained_model$datapath)$predictor_set,
@@ -159,7 +171,7 @@ app_server <- function(input, output) {
     })
   })
 
-  # Predict single ----
+  # Predict single
   shiny::observeEvent(input$single_pred, {
     model <- base::readRDS(input$pretrained_model$datapath)
 
@@ -191,11 +203,12 @@ app_server <- function(input, output) {
       text_log(paste(text_log(), "Retention time: ", pred, "\n"))
     }
   })
+
   output$single_pred_out <- shiny::renderText({
     text_log()
   })
 
-  # Predict Mult ----
+  # Predict Mult
   mult_pred_react <- shiny::reactive({
     mult.pred(
       model = base::readRDS(input$pretrained_model$datapath),
@@ -223,13 +236,13 @@ app_server <- function(input, output) {
 }
 
 app_ui <- shiny::fluidPage(
-  # title ----
+  # title
   shiny::titlePanel("LCMS Retention Time prediciton"),
 
-  # Sidebar layout with input and output definitions ----
+  # Sidebar layout with input and output definitions
   shiny::sidebarLayout(
 
-    # Sidebar panel for inputs ----
+    # Sidebar panel for inputs
     sidebarPanel(
       shinyhelper::helper(
         selectInput(
@@ -258,7 +271,7 @@ app_ui <- shiny::fluidPage(
 <h2 id=\"utilize-model-on-new-data\">Utilize model on new data</h2>
 <p>This step requires a pretrained model which can be uploaded. Afterwards you can use your model to predict retention times of new metabolites by providing either a single SMILE/HMDB ID combination or a whole list of molecules.</p>"
       ),
-      # Selective Measuring and Train new Model ----
+      # Selective Measuring and Train new Model
       shiny::conditionalPanel(
         condition = "input.mode == 'Selective Measuring' ||
                      input.mode == 'Train new Model'",
@@ -282,7 +295,7 @@ app_ui <- shiny::fluidPage(
 "
         ),
       ),
-      # Train new Model ----
+      # Train new Model
       shiny::conditionalPanel(
         condition = "input.mode == 'Train new Model'",
         shinyhelper::helper(
@@ -316,7 +329,7 @@ app_ui <- shiny::fluidPage(
         shiny::downloadButton("save_model", "save Model"),
         shiny::downloadButton("save_predictors", "save predictor set as csv")
       ),
-      # Selective Measuring ----
+      # Selective Measuring
       shiny::conditionalPanel(
         condition = "input.mode == 'Selective Measuring'",
         shiny::numericInput("k",
@@ -326,7 +339,7 @@ app_ui <- shiny::fluidPage(
         shiny::actionButton("sm2", "Calculate Cluster and Medodids"),
         shiny::downloadButton("save_cluster", "Save Cluster and Medoids as .xlsx")
       ),
-      # Utilize Model to predict on new Data ----
+      # Utilize Model to predict on new Data
       shiny::conditionalPanel(
         condition = "input.mode == 'Utilize Model to predict on new Data'",
         shinyhelper::helper(
@@ -408,12 +421,10 @@ The coefficients of the model can be selected or unselected depending on the nee
       )
     ),
 
-    # Main panel for displaying outputs ----
+    # Main panel for displaying outputs
     mainPanel(
 
       # Output:
-
-
       shinybusy::add_busy_spinner(spin = "fading-circle"),
       shiny::verbatimTextOutput("single_pred_out"),
       shiny::tableOutput("mult_pred_out"),

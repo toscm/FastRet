@@ -1,6 +1,6 @@
 shiny.sm<-function(raw_data, method, k_cluster){
 
-  # validate input data ----
+  # validate input data
   raw_data<- data.frame(raw_data)
   validate.inputdata(raw_data)
 
