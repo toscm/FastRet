@@ -1,8 +1,9 @@
 ^_pkgdown\.yml$
 ^.lintr$
+^.vscode$
 ^\.github$
 ^\.Rproj\.user$
-^dockerfiles
+^Dockerfile$
 ^docs$
 ^FastRet\.Rproj$
 ^pkgdown$

@@ -187,7 +187,7 @@ html_privacy_policy <- '
   <div>There are no other tracking methods.</div>
   <h2>Privacy Contact</h2>
   <a href="http://www.uni-regensburg.de/universitaet/datenschutzbeauftragte/index.html">
-    Datenschutzbeauftrage derUniversität
+    Datenschutzbeauftrage der Universit\\u00E4t
   </a>
   </div>
 '
