@@ -2,7 +2,7 @@
 ^.lintr$
 ^\.github$
 ^\.Rproj\.user$
-^Dockerfile$
+^dockerfiles
 ^docs$
 ^FastRet\.Rproj$
 ^pkgdown$
